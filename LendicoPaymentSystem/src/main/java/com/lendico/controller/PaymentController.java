@@ -20,9 +20,9 @@ public class PaymentController {
 	PaymentService paymentService;
 	
 	 @PostMapping(path ="/repaymentPlan/", produces = MediaType.APPLICATION_JSON_VALUE)
-	 public BorrowerPaymentInfoResp getGUIDbyToken(@RequestBody PaymentReq paymentReq) {
+	 public BorrowerPaymentInfoResp getRepaymentPlan(@RequestBody PaymentReq paymentReq) {
 		 
-		 System.out.println("getGUIDbyToken");
+		 System.out.println("repaymentPlan");
 		 BorrowerPaymentInfoResp  resp=paymentService.getRepaymentPlan(paymentReq);
 		 
 		 return resp;
