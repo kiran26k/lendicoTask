@@ -1,37 +1,51 @@
 package com.lendico.serviceimpl;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.http.Http;
 import org.springframework.stereotype.Service;
 
 import com.lendico.model.BorrowerPaymentInfoResp;
 import com.lendico.model.PaymentReq;
-
+import com.lendico.service.PaymentService;
 
 @Service("paymentService")
-public class PaymentServiceImpl {
+public class PaymentServiceImpl implements PaymentService {
 
 	int daysInMonth = 30;
+	public static final int YEAR_DAYS = 360;
 
-	@Bean
-	public IntegrationFlow getRepaymentPlan(PaymentReq paymentReq) {
-		System.out.println(" getRepaymentPlan ");
-		BorrowerPaymentInfoResp response = new BorrowerPaymentInfoResp();
-		double amt = getBorrowerAmount(getInterest(paymentReq), getPrinciple());
-		response.setBorrowerPaymentAmount(amt);
-		response.setDate(new Date());
-		response.setDurationl(100);
+	@Override
+	public List<BorrowerPaymentInfoResp> getRepaymentPlan(PaymentReq paymentReq) {
+		List<BorrowerPaymentInfoResp> response = new ArrayList<BorrowerPaymentInfoResp>();
+
+		BorrowerPaymentInfoResp borrowerPaymentInfo = new BorrowerPaymentInfoResp();
+
+		int duration = paymentReq.getDurationl();
+		double princple = getPrinciple(paymentReq);
+		double interest = getInterest(paymentReq);
+		double outstanding = paymentReq.getLoanAmount() - princple;
+		double amt = getBorrowerAmount(interest, princple);
+
+		while (outstanding > 0) {
+			borrowerPaymentInfo.setBorrowerPaymentAmount(amt);
+			borrowerPaymentInfo.setDate(new Date());
+			borrowerPaymentInfo.setDurationl(duration);
+			borrowerPaymentInfo.setInterest(interest);
+			borrowerPaymentInfo.setPrincipal(princple);
+			borrowerPaymentInfo.setRemainingOutstandingPrincipal(outstanding);
 		
+			duration = paymentReq.getDurationl();
+			princple = getPrinciple(paymentReq);
+			interest = getInterest(paymentReq);
+			outstanding = paymentReq.getLoanAmount() - princple;
+			System.out.println("outstanding "+outstanding);
+			amt = getBorrowerAmount(interest, princple);
 		
-		return flow -> flow.log()
-				.handle(Http.outboundGateway("http://localhost:8080/amexsite/v1/corporate_accounts/mobility")
-						.httpMethod(HttpMethod.POST).expectedResponseType(BorrowerPaymentInfoResp.class))
-				.log().transform(BorrowerPaymentInfoResp.class, c -> c);
+		}
+
+		return response;
 	}
 
 	double getInterest(PaymentReq paymentReq) {
@@ -39,20 +53,33 @@ public class PaymentServiceImpl {
 		// (Nominal-Rate * Days in Month * Initial Outstanding Principal) / days in year
 		// e.g. first installment Interest = (5.00 * 30 * 5000 / 360) = 2083.33333333
 		// cents
-		double principle = getPrinciple();
-		return (paymentReq.getNominalRate() * daysInMonth * principle) / 360;
+		return (paymentReq.getNominalRate() * daysInMonth * paymentReq.getLoanAmount()) / YEAR_DAYS;
 	}
 
-	double getPrinciple() {
-		// Annuity	(Borrower Payment Amount) Need to calculate
+	double getPrinciple(PaymentReq paymentReq) {
+		// Annuity (Borrower Payment Amount) Need to calculate
 		// Principal = Annuity - Interest (if, calculated interest amount exceeds the
-		// initial outstanding principal amount, take initial outstanding principal amount instead)
-
-		return 0.0;
+		// initial outstanding principal amount, take initial outstanding principal
+		// amount instead)
+		if(getInterest(paymentReq) > paymentReq.getLoanAmount()) {
+			return paymentReq.getLoanAmount();
+		}
+		System.out.println("getPrinciple ");
+		return getAnuity(paymentReq) - getInterest(paymentReq);
 	}
 
 	double getBorrowerAmount(double interest, double principl) {
+		System.out.println("getBorrowerAmount "+interest + principl);
 		return interest + principl;
+	}
+
+	double getAnuity(PaymentReq paymentReq) {
+		double rate = paymentReq.getNominalRate() / 100;
+		int durationInMonth = paymentReq.getDurationl() / 30;
+		double dat = (1 - (1 / (1 + rate) * durationInMonth));
+		double annuity = dat / paymentReq.getNominalRate();
+		System.out.println("annuity "+annuity);
+		return annuity;
 	}
 
 }
