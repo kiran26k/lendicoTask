@@ -4,16 +4,16 @@ import java.util.Date;
 
 public class PaymentReq {
 
-	private long loanAmount;
+	private double loanAmount;
 	private double nominalRate;
-	private int durationl;
+	private int duration;
 	private Date startDate;
 
-	public long getLoanAmount() {
+	public double getLoanAmount() {
 		return loanAmount;
 	}
 
-	public void setLoanAmount(long loanAmount) {
+	public void setLoanAmount(double loanAmount) {
 		this.loanAmount = loanAmount;
 	}
 
@@ -25,12 +25,12 @@ public class PaymentReq {
 		this.nominalRate = nominalRate;
 	}
 
-	public int getDurationl() {
-		return durationl;
+	public int getDuration() {
+		return duration;
 	}
 
-	public void setDurationl(int durationl) {
-		this.durationl = durationl;
+	public void setDuration(int durationl) {
+		this.duration = durationl;
 	}
 
 	public Date getStartDate() {
@@ -43,7 +43,7 @@ public class PaymentReq {
 
 	@Override
 	public String toString() {
-		return "PaymentReq [loanAmount=" + loanAmount + ", nominalRate=" + nominalRate + ", durationl=" + durationl
+		return "PaymentReq [loanAmount=" + loanAmount + ", nominalRate=" + nominalRate + ", duration=" + duration
 				+ ", startDate=" + startDate + "]";
 	}
 
