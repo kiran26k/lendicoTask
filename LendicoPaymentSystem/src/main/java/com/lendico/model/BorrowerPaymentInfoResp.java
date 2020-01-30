@@ -1,7 +1,5 @@
 package com.lendico.model;
 
-import java.util.Date;
-
 public class BorrowerPaymentInfoResp {
 
 	private double borrowerPaymentAmount;
@@ -9,8 +7,7 @@ public class BorrowerPaymentInfoResp {
 	private double interest;
 	private double principal;
 	private double remainingOutstandingPrincipal;
-	private int durationl;
-	private Date date;
+	private String date;
 
 	public double getBorrowerPaymentAmount() {
 		return borrowerPaymentAmount;
@@ -52,19 +49,11 @@ public class BorrowerPaymentInfoResp {
 		this.remainingOutstandingPrincipal = remainingOutstandingPrincipal;
 	}
 
-	public int getDurationl() {
-		return durationl;
-	}
-
-	public void setDurationl(int durationl) {
-		this.durationl = durationl;
-	}
-
-	public Date getDate() {
+	public String getDate() {
 		return date;
 	}
 
-	public void setDate(Date date) {
+	public void setDate(String date) {
 		this.date = date;
 	}
 
@@ -73,7 +62,7 @@ public class BorrowerPaymentInfoResp {
 		return "BorrowerPaymentInfoResp [borrowerPaymentAmount=" + borrowerPaymentAmount
 				+ ", initialOutstandingPrincipal=" + initialOutstandingPrincipal + ", interest=" + interest
 				+ ", principal=" + principal + ", remainingOutstandingPrincipal=" + remainingOutstandingPrincipal
-				+ ", durationl=" + durationl + ", date=" + date + "]";
+				+ ", date=" + date + "]";
 	}
 
 }
