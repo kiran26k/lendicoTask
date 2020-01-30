@@ -32,7 +32,6 @@ public class PaymentServiceImpl implements PaymentService {
 
 		while (outstanding > 0 || duration != 0) {
 			BorrowerPaymentInfoResp borrowerPaymentInfo = new BorrowerPaymentInfoResp();
-
 			borrowerPaymentInfo.setBorrowerPaymentAmount(amt);
 			if (duration == initalDuration) {
 				borrowerPaymentInfo.setDate(CommonUtility.get_MM_DD_YY_StringDate(paymentReq.getStartDate()));
